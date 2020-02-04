@@ -195,4 +195,3 @@ var FileReaderComponent = (function () {
     return FileReaderComponent;
 }());
 window.FileReaderComponent = new FileReaderComponent();
-//# sourceMappingURL=FileReaderComponent.js.map
