@@ -64,7 +64,7 @@ class FileReaderComponent {
                         list = new FileReaderComponent.ConcatFileList(existing, list);
                     }
                 }
-                
+
                 this.elementDataTransfers.set(ev.target, list);
             }
         };
@@ -165,7 +165,7 @@ class FileReaderComponent {
                     try {
                         const arrayBuffer: ArrayBuffer = <ArrayBuffer>r.result;
                         this.fileStreams[fileRef] = { file, arrayBuffer };
-                        
+
                         resolve(fileRef);
                     } catch (e) {
                         reject(e);
@@ -173,7 +173,7 @@ class FileReaderComponent {
                 }
             })(reader);
             reader.readAsArrayBuffer(file);
-            
+
             return fileRef;
         });
     }
@@ -197,7 +197,7 @@ class FileReaderComponent {
     }
 
     public ReadFileMarshalledAsync = (readFileParams: IReadFileParams): Promise<string> => {
-        
+
         return new Promise<string>((resolve, reject) => {
             const file: File = this.fileStreams[readFileParams.fileRef].file;
             try {

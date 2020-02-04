@@ -12,13 +12,13 @@ namespace Blazor.FileReader
             = Type.GetType("Mono.WebAssembly.Interop.MonoWebAssemblyJSRuntime, Mono.WebAssembly.Interop");
 
         private readonly static MethodInfo _invokeUnmarshalled = GetInvokeUnmarshalled();
-        private readonly static Dictionary<string, MethodInfo> _genericinvokeUnmarshalledMethods 
+        private readonly static Dictionary<string, MethodInfo> _genericinvokeUnmarshalledMethods
             = new Dictionary<string, MethodInfo>();
 
         public static bool IsInvokeUnmarshalledSupported()
         {
             return _invokeUnmarshalled != null;
-        } 
+        }
 
         public static TReturn InvokeUnmarshalled<TParam, TReturn>(this IJSRuntime jsRuntime, string methodName, TParam parameter)
         {

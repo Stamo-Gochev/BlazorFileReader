@@ -1,0 +1,38 @@
+﻿@page "/upload"
+@inject IFileReaderService fileReaderService
+@inject HttpClient HttpClient
+
+<h3>Upload multiple</h3>
+<div>
+<input type="file" multiple @ref=inputElement />
+<button @onclick="UploadFiles">Upload</button>
+
+</div>
+<br /><pre>@debug</pre>
+
+@code {
+    string debug;
+    ElementReference inputElement;
+    IFileReaderRef fileReaderReference;
+
+    protected override void OnAfterRender(bool isFirstRender)
+    {
+        fileReaderReference = fileReaderService.CreateReference(inputElement);
+    }
+
+    public async Task UploadFiles()
+    {
+        var multipartFormDataContent = new MultipartFormDataContent();
+        foreach (var file in await fileReaderReference.EnumerateFilesAsync())
+        {
+            multipartFormDataContent.Add(
+                new StreamContent(await file.OpenReadAsync(), 8192),
+                "files",
+                (await file.ReadFileInfoAsync()).Name);
+        }
+
+        var res = await HttpClient.PostAsync(requestUri: "http://localhost:61393/api/upload/files",
+                content: multipartFormDataContent);
+        debug = await res.Content.ReadAsStringAsync();
+    }
+}

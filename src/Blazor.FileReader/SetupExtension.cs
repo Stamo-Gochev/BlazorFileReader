@@ -44,7 +44,7 @@ namespace Blazor.FileReader
             });
 
             services.AddScoped<IFileReaderService, FileReaderService>();
-            
+
             return services;
         }
     }

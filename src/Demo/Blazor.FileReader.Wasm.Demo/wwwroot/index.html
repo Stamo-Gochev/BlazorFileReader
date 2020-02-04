@@ -8,6 +8,8 @@
     <link href="css/bootstrap/bootstrap.min.css" rel="stylesheet" />
     <link href="css/site.css" rel="stylesheet" />
 
+    <script src="_content/Tewr.Blazor.FileReader"/FileReaderComponent.js"></script>
+
 </head>
 <body>
     <app>
@@ -39,10 +41,10 @@
             if (!window.XMLHttpRequest) {
                 return;
             }
-            
+
             var total = 0;
             var loaded = 0;
-            
+
             var proxied = window.XMLHttpRequest.prototype.open;
             window.XMLHttpRequest.prototype.open = function () {
                 var file = arguments[1];
