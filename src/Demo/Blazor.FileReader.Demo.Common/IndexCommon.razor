@@ -2,6 +2,7 @@
 @using System.Diagnostics;
 @inject IFileReaderService fileReaderService
 @inject IJSRuntime CurrentJSRuntime
+
 <h1>Hello, files!</h1>
 
 Welcome to your new filestreaming app.
@@ -9,18 +10,37 @@ Welcome to your new filestreaming app.
 This demo reads a file without doing anything particular with it.
 <br />
 There are other demos in the menu.
-<br />
-<br />
 
-<input type="file" @ref=inputElement />
-<button @onclick=ReadFile class="btn btn-primary">Read file</button>
-<button @onclick=ClearFile class="btn btn-primary">Clear</button>
+<div>
 
-<br />
-<br />
-<progress max="@max" value="@value" />
-<br />
-<textarea style="max-width: 100%;" cols="50" rows="20">@Output</textarea>
+    <form action="/upload/files">
+
+        <input type="file" @ref=inputElement />
+        <button type="button" @onclick=ReadFile class="btn btn-primary">Read file</button>
+        <button type="button" @onclick=ClearFile class="btn btn-primary">Clear</button>
+
+        <div>
+            <button type="submit">Submit</button>
+        </div>
+
+    </form>
+</div>
+
+<div>
+    <div>
+        Progress: <progress max="@max" value="@value" />
+    </div>
+
+    <div>
+        <textarea style="max-width: 100%;" cols="50" rows="20">@Output</textarea>
+
+    </div>
+</div>
+
+<div>
+    <img src="@ImagePath" />
+</div>
+
 @code {
 
     [Parameter]
@@ -28,6 +48,7 @@ There are other demos in the menu.
     public long max;
     public long value;
     ElementReference inputElement;
+    public string ImagePath = "";
 
     string Output { get; set; }
 
@@ -44,10 +65,12 @@ There are other demos in the menu.
         this.StateHasChanged();
         var nl = Environment.NewLine;
         var files = (await fileReaderService.CreateReference(inputElement).EnumerateFilesAsync()).ToList();
+
         foreach (var file in files)
         {
             max += (await file.ReadFileInfoAsync()).Size;
         }
+
         foreach (var file in files)
         {
             var stopwatch = new Stopwatch();
@@ -60,7 +83,8 @@ There are other demos in the menu.
             Output += $"Reading file...";
             this.StateHasChanged();
             Console.WriteLine(Output);
-            using (var fs = await file.OpenReadAsync())
+
+            using (Stream fs = await file.OpenReadAsync())
             {
                 var buffer = new byte[BufferSize];
                 int count;
@@ -81,10 +105,37 @@ There are other demos in the menu.
                 }
                 stopwatch.Stop();
                 Output += $"Done reading file {fileInfo.Name} - {fs.Length} bytes in {stopwatch.ElapsedMilliseconds}ms.{nl}.";
+
+
+                await SaveFileStream(fs, fileInfo.Name);
+
+                await Task.Delay(1);
+
+                ImagePath = fileInfo.Name;
+
             }
+
             this.StateHasChanged();
         }
+    }
 
+    private async Task SaveFileStream(Stream stream, string fileName)
+    {
+        //var fileName = Path.GetRandomFileName();
+        var fullPath = Path.GetFullPath("wwwroot");
+        var finalPath = Path.Combine(fullPath, fileName);
+
+
+        File.Delete(finalPath);
+
+        using (var fileStream = new FileStream(finalPath, FileMode.CreateNew, FileAccess.Write))
+        {
+            //await stream.CopyToAsync(fileStream);
+            //stream.FlushAsync();
+
+            stream.Seek(0, SeekOrigin.Begin);
+            await stream.CopyToAsync(fileStream);
+        }
     }
 }
 
